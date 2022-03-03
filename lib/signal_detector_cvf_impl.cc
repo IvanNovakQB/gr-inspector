@@ -232,19 +232,33 @@ void signal_detector_cvf_impl::build_window()
 // set auto threshold by searching for jumps between bins
 void signal_detector_cvf_impl::build_threshold()
 {
-    // copy array to work with
+    // // copy array to work with
+    // memcpy(d_tmp_pxx, d_pxx_out, sizeof(float) * d_fft_len);
+    // // sort bins
+    // d_threshold = 500;
+    // std::sort(d_tmp_pxx, d_tmp_pxx + d_fft_len);
+    // float range = d_tmp_pxx[d_fft_len - 1] - d_tmp_pxx[0];
+    // // search specified normized jump
+    // for (unsigned int i = 0; i < d_fft_len; i++) {
+    //     if ((d_tmp_pxx[i + 1] - d_tmp_pxx[i]) / range > 1 - d_sensitivity) {
+    //         d_threshold = d_tmp_pxx[i];
+    //         break;
+    //     }
+    // }
+
+     // copy array to work with
     memcpy(d_tmp_pxx, d_pxx_out, sizeof(float) * d_fft_len);
     // sort bins
-    d_threshold = 500;
+    d_threshold = 0;
     std::sort(d_tmp_pxx, d_tmp_pxx + d_fft_len);
     float range = d_tmp_pxx[d_fft_len - 1] - d_tmp_pxx[0];
     // search specified normized jump
     for (unsigned int i = 0; i < d_fft_len; i++) {
-        if ((d_tmp_pxx[i + 1] - d_tmp_pxx[i]) / range > 1 - d_sensitivity) {
-            d_threshold = d_tmp_pxx[i];
-            break;
-        }
+        d_threshold += d_tmp_pxx[i];
     }
+    d_threshold/=d_fft_len;
+    d_threshold-=-3;
+    //d_threshold*=1.02;
 }
 
 // find bins above threshold and adjacent bins for each signal
