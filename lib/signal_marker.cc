@@ -43,11 +43,12 @@ signal_marker::~signal_marker()
     delete d_zone;
 }
 
-void signal_marker::set_marker(int i, float center, float bw, int unit)
+void signal_marker::set_marker(int i, float center, float bw, float power, int unit)
 {
     d_number = i;
     d_freq = center;
     d_bw = bw;
+    d_power = power;
     d_unit = unit;
     d_center->setLineStyle(QwtPlotMarker::VLine);
     QColor c = Qt::white;
@@ -99,6 +100,8 @@ QString signal_marker::basic_text()
     qstring.append("f = " + QString::number(d_freq / d_unit) + " " + d_unittxt);
     qstring.append("\n");
     qstring.append("B = " + QString::number(d_bw / d_unit) + " " + d_unittxt);
+    qstring.append("\n");
+    qstring.append("Power = " + QString::number(d_power) + " dB");
     return qstring;
 }
 

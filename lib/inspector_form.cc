@@ -139,6 +139,7 @@ void inspector_form::spawn_signal_selector()
         *d_rf_unit * (d_zoomer->zoomRect().x() +
                       d_zoomer->zoomRect().width() / 2), // center of current zoom
         *d_rf_unit * d_zoomer->zoomRect().width() / 2,
+        0,
         *d_rf_unit); // half bandwidth of current zoom
     add_msg_queue(d_markers[0]->d_freq - d_cfreq, d_markers[0]->d_bw);
 }
@@ -261,10 +262,10 @@ void inspector_form::mouseMoveEvent(QMouseEvent* eventMove)
         float bandwidth = d_markers[0]->d_bw;
         detach_markers();
         if (d_clicked_marker == CENTER) {
-            d_markers[0]->set_marker(0, xVal * *d_rf_unit, bandwidth, *d_rf_unit);
+            d_markers[0]->set_marker(0, xVal * *d_rf_unit, bandwidth, 0, *d_rf_unit);
         } else if (d_clicked_marker == LEFT || d_clicked_marker == RIGHT) {
             d_markers[0]->set_marker(
-                0, cfreq, 2 * std::abs(cfreq - xVal * *d_rf_unit), *d_rf_unit);
+                0, cfreq, 2 * std::abs(cfreq - xVal * *d_rf_unit), 0, *d_rf_unit);
         }
     }
     // mouse over
@@ -285,10 +286,10 @@ void inspector_form::mouseReleaseEvent(QMouseEvent* eventRelease)
         float bandwidth = d_markers[0]->d_bw;
         detach_markers();
         if (d_clicked_marker == CENTER) {
-            d_markers[0]->set_marker(0, xVal * *d_rf_unit, bandwidth, *d_rf_unit);
+            d_markers[0]->set_marker(0, xVal * *d_rf_unit, bandwidth, 0, *d_rf_unit);
         } else if (d_clicked_marker == LEFT || d_clicked_marker == RIGHT) {
             d_markers[0]->set_marker(
-                0, cfreq, 2 * std::abs(cfreq - xVal * *d_rf_unit), *d_rf_unit);
+                0, cfreq, 2 * std::abs(cfreq - xVal * *d_rf_unit), 0, *d_rf_unit);
         }
         d_clicked_marker = NONE;
         d_mouse_offset = 0.0;
@@ -349,12 +350,12 @@ void inspector_form::drawOverlay()
     if (d_rf_map->size() <= d_marker_count) {
         for (int i = 0; i < d_rf_map->size(); i++) {
             d_markers[i]->set_marker(
-                i, d_cfreq + d_rf_map->at(i)[0], d_rf_map->at(i)[1], *d_rf_unit);
+                i, d_cfreq + d_rf_map->at(i)[0], d_rf_map->at(i)[1], d_rf_map->at(i)[2], *d_rf_unit);
         }
     } else {
         for (int i = 0; i < d_marker_count; i++) {
             d_markers[i]->set_marker(
-                i, d_cfreq + d_rf_map->at(i)[0], d_rf_map->at(i)[1], *d_rf_unit);
+                i, d_cfreq + d_rf_map->at(i)[0], d_rf_map->at(i)[1], d_rf_map->at(i)[2], *d_rf_unit);
         }
     }
 }

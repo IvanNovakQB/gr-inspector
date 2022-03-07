@@ -188,6 +188,7 @@ void qtgui_inspector_sink_vf_impl::unpack_message(pmt::pmt_t msg)
         temp.clear();
         temp.push_back(pmt::f32vector_ref(row, 0));
         temp.push_back(pmt::f32vector_ref(row, 1));
+        temp.push_back(pmt::f32vector_ref(row, 2));
         d_rf_map.push_back(temp);
     }
 }
