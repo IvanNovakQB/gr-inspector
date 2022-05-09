@@ -141,6 +141,14 @@ void qtgui_inspector_sink_vf_impl::handle_msg(pmt::pmt_t msg)
     unpack_message(msg);
     d_main_gui->msg_received();
 
+    // add center frequency
+    float temp_freq;
+    for (unsigned int i = 0; i < pmt::length(msg); i++) {
+        pmt::pmt_t row = pmt::vector_ref(msg, i);
+        temp_freq = pmt::f32vector_ref(row, 0);
+        pmt::f32vector_set(row, 0, temp_freq + d_cfreq);
+    }
+
     // bypass block if no manual signal selection
     if (!d_manual) {
         message_port_pub(pmt::intern("map_out"), msg);
