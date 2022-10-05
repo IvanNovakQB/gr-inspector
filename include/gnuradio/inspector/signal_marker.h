@@ -36,7 +36,7 @@ public:
     QwtPlotMarker* d_label;
     QwtPlotZoneItem* d_zone;
     QwtPlot* d_plot;
-    float d_freq, d_bw;
+    float d_freq, d_bw, d_power;
     int d_number, d_unit;
     QString d_unittxt;
 
@@ -46,7 +46,7 @@ public:
 
     void add_text(std::string text);
     void set_label_y(qreal yval);
-    void set_marker(int i, float center, float bw, int unit);
+    void set_marker(int i, float center, float bw, float power, int unit);
     QString basic_text();
     void set_label_text(QString qstring);
 };

@@ -235,16 +235,16 @@ void signal_detector_cvf_impl::build_threshold()
     // copy array to work with
     memcpy(d_tmp_pxx, d_pxx_out, sizeof(float) * d_fft_len);
     // sort bins
-    d_threshold = 500;
+    d_threshold = 0;
     std::sort(d_tmp_pxx, d_tmp_pxx + d_fft_len);
     float range = d_tmp_pxx[d_fft_len - 1] - d_tmp_pxx[0];
     // search specified normized jump
     for (unsigned int i = 0; i < d_fft_len; i++) {
-        if ((d_tmp_pxx[i + 1] - d_tmp_pxx[i]) / range > 1 - d_sensitivity) {
-            d_threshold = d_tmp_pxx[i];
-            break;
-        }
+        d_threshold += d_tmp_pxx[i];
     }
+    d_threshold/=d_fft_len;
+    d_threshold-=-3;
+    //d_threshold*=1.02;
 }
 
 // find bins above threshold and adjacent bins for each signal
@@ -312,9 +312,10 @@ pmt::pmt_t signal_detector_cvf_impl::pack_message()
     unsigned signal_count = d_signal_edges.size();
     pmt::pmt_t msg = pmt::make_vector(signal_count, pmt::PMT_NIL);
     for (unsigned i = 0; i < signal_count; i++) {
-        pmt::pmt_t curr_edge = pmt::make_f32vector(2, 0.0);
+        pmt::pmt_t curr_edge = pmt::make_f32vector(3, 0.0);
         pmt::f32vector_set(curr_edge, 0, d_signal_edges.at(i).at(0));
         pmt::f32vector_set(curr_edge, 1, d_signal_edges.at(i).at(1));
+        pmt::f32vector_set(curr_edge, 2, d_signal_edges.at(i).at(2));
         pmt::vector_set(msg, i, curr_edge);
     }
     return msg;
@@ -381,6 +382,15 @@ int signal_detector_cvf_impl::work(int noutput_items,
             bandwidth = quantization * round(bandwidth / quantization);
             temp.push_back(freq_c);
             temp.push_back(bandwidth);
+            // find power peak
+            float peak_power = -FLT_MAX;
+            for (int j = flanks[i][0]; j < flanks[i][1]; j++) {
+                peak_power = (peak_power < d_pxx_out[j]) ? d_pxx_out[j] : peak_power;
+            }
+
+
+            temp.push_back(peak_power);
+
             rf_map.push_back(temp);
         }
     }
@@ -391,7 +401,7 @@ int signal_detector_cvf_impl::work(int noutput_items,
     if (compare_signal_edges(&rf_map)) {
         d_signal_edges = rf_map;
         message_port_pub(pmt::intern("map_out"), pack_message());
-        write_logfile_entry();
+        // write_logfile_entry();  // disabled because it generates some junk files
     }
 
     return 1; // one vector has been processed
